@@ -1,0 +1,129 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on Pieter&#39;s Techblog</title>
+        <link>http://thisisnottheuseryouarelookingfor.github.io/posts/</link>
+        <description>Recent content in Posts on Pieter&#39;s Techblog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+        <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
+        <atom:link href="http://thisisnottheuseryouarelookingfor.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Testing, testing, 1,2,3</title>
+            <link>http://thisisnottheuseryouarelookingfor.github.io/posts/2020/08/testing-testing-123/</link>
+            <pubDate>Mon, 31 Aug 2020 00:00:00 +0000</pubDate>
+            
+            <guid>http://thisisnottheuseryouarelookingfor.github.io/posts/2020/08/testing-testing-123/</guid>
+            <description>Welcome! Welcome to my second attempt ever to start a blog! The idea is to do a minimum of one post per month based on a few ground rules:
+ It must provide knowledge people may benefit from Not each topic is necessarily tech-related Every post must be accessible and provide enough information so less tech-savvy people may enjoy reading them as well.  This Month&amp;rsquo;s topic is&amp;hellip; Blogs! What better way to start off than to explain how I setup my development environment to embark on this journey, am I right?</description>
+            <content type="html"><![CDATA[<h2 id="welcome">Welcome!</h2>
+<p>Welcome to my second attempt ever to start a blog! The idea is to do a minimum of one post per month based on a few ground rules:</p>
+<ul>
+<li>It must provide <strong>knowledge</strong> people may benefit from</li>
+<li>Not each topic is necessarily tech-related</li>
+<li>Every post must be accessible and provide enough information so less tech-savvy people may enjoy reading them as well.</li>
+</ul>
+<p>This Month&rsquo;s topic is&hellip; Blogs! What better way to start off than to explain how I setup my development environment to embark on this journey, am I right?</p>
+<h2 id="what-framework-to-use">What framework to use?</h2>
+<p>Let&rsquo;s start off with a small requirement analysis. I wanted a blogging environment that is:</p>
+<ul>
+<li>Easy to use - I&rsquo;m willing to write lots of content, but any additional maintenance on a system (no updates/plugins/&hellip;) would take up too much of my time.</li>
+<li>Portable - Most of the time I do my research on the way, during lunch breaks, so I want to write content anywhere!</li>
+<li>Static - I have seen too many sites used as webshells, my blog will have to be static. Less moving parts makes it easier to secure.</li>
+<li>Allows feedback - I want to know what you guys think of these posts!</li>
+</ul>
+<p>Based on those requirements I searched for a few minutes and came to my shortlist of Gatsby, Hugo, Jekyll and Scully.</p>
+<p>Gatsby and Scully are both JavaScript based, and in my opinion still required quite a lot of diving into Javascript where I just wanted to add simple markdown files, and let it generate nice static pages. I&rsquo;m pretty sure these may provide more flexibility for the webgurus out there but I&rsquo;m not a webdesigner, so those were out for me.</p>
+<p>That leaves us with Jekyll and Hugo. I had used Jekyll in the past, so I knew what was possible with that one, so I thought for a while about using Jekyll again. But then I tried Hugo and boy, was I in love! It came with default Disquss integration, rss feed and was set up in seconds(!) in my lab. I decided to go with Hugo in the end, we&rsquo;ll see if I made the right choice in the end ;)</p>
+
+    <img src="/img/hugo_logo.png"  class="center"  />
+
+
+<h2 id="setting-up-shop">Setting up shop</h2>
+<p>The easiest way to start developing would&rsquo;ve been to download the Hugo binary and run it. However, that wouldn&rsquo;t be very portable, now would it?</p>
+<p>I&rsquo;m doing most of my development in Visual Studio Code, as I use different programming languages quite frequently. One of the cool recent features they have added is remote container support: run your IDE and all its plugins in a docker container, whilst the code still resides on your host system. Sounds pretty neat right?</p>
+<p>To get this working though you&rsquo;ll need a few things:</p>
+<ul>
+<li><a href="https://www.docker.com/products/docker-desktop">Docker</a></li>
+<li>A VSCode plugin called <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Remote-Containers</a>.</li>
+</ul>
+<p>Installation of both was very straigh-forward, so I won&rsquo;t be covering that part. If you stumble upon any issues feel free to hit me up on my socials, always willing to help!</p>
+<p>My first objective was to get things running in a docker environment. Someone already provided the necessary config for a hugo devcontainer. Unfortunately for me there still seemed to be an issue with the hugo_extended variant which i needed, (glibc issues on alpine) so I had to modify it a bit.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dockerfile" data-lang="dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> golang:latest</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#75715e"># VARIANT can be either &#39;hugo&#39; for the standard version or &#39;hugo_extended&#39; for the extended version.</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ARG</span> VARIANT<span style="color:#f92672">=</span>hugo_extended
+<span style="color:#75715e"># VERSION can be either &#39;latest&#39; or a specific version number</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ARG</span> VERSION<span style="color:#f92672">=</span>latest
+<span style="color:#66d9ef">RUN</span> <span style="color:#66d9ef">case</span> <span style="color:#e6db74">${</span>VERSION<span style="color:#e6db74">}</span> in <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    latest<span style="color:#f92672">)</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    export VERSION<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | grep <span style="color:#e6db74">&#34;tag_name&#34;</span> | awk <span style="color:#e6db74">&#39;{print substr($2, 3, length($2)-4)}&#39;</span><span style="color:#66d9ef">)</span> ;;<span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#66d9ef">esac</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    echo <span style="color:#e6db74">${</span>VERSION<span style="color:#e6db74">}</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    wget -O <span style="color:#e6db74">${</span>VERSION<span style="color:#e6db74">}</span>.tar.gz https://github.com/gohugoio/hugo/releases/download/v<span style="color:#e6db74">${</span>VERSION<span style="color:#e6db74">}</span>/<span style="color:#e6db74">${</span>VARIANT<span style="color:#e6db74">}</span>_<span style="color:#e6db74">${</span>VERSION<span style="color:#e6db74">}</span>_Linux-64bit.tar.gz <span style="color:#f92672">&amp;&amp;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    tar xf <span style="color:#e6db74">${</span>VERSION<span style="color:#e6db74">}</span>.tar.gz <span style="color:#f92672">&amp;&amp;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    mv hugo* /usr/bin/hugo<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span>    <span style="color:#75715e"># go get github.com/yaegashi/muslstack &amp;&amp; \</span>
+    <span style="color:#75715e"># muslstack -s 0x800000 /usr/bin/hugo</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> mcr.microsoft.com/vscode/devcontainers/base:0-buster</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span> /usr/bin/hugo /usr/bin<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">EXPOSE</span><span style="color:#e6db74"> 1313</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">WORKDIR</span><span style="color:#e6db74"> /src</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">CMD</span> [<span style="color:#e6db74">&#34;/usr/bin/hugo server&#34;</span>]<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><p>Aside from the dockerfile you will also require a devcontainer.json file. This file contains the plugins to load in the container, which dockerfile to use to build the image and what arguments to pass in the dockerfile.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json"><span style="color:#960050;background-color:#1e0010">//</span> <span style="color:#960050;background-color:#1e0010">For</span> <span style="color:#960050;background-color:#1e0010">format</span> <span style="color:#960050;background-color:#1e0010">details,</span> <span style="color:#960050;background-color:#1e0010">see</span> <span style="color:#960050;background-color:#1e0010">https://aka.ms/vscode-remote/devcontainer.json</span> <span style="color:#960050;background-color:#1e0010">or</span> <span style="color:#960050;background-color:#1e0010">this</span> <span style="color:#960050;background-color:#1e0010">file&#39;s</span> <span style="color:#960050;background-color:#1e0010">README</span> <span style="color:#960050;background-color:#1e0010">at:</span>
+<span style="color:#960050;background-color:#1e0010">//</span> <span style="color:#960050;background-color:#1e0010">https://github.com/microsoft/vscode-dev-containers/tree/v</span><span style="color:#ae81ff">0.128</span><span style="color:#960050;background-color:#1e0010">.</span><span style="color:#ae81ff">0</span><span style="color:#960050;background-color:#1e0010">/containers/hugo</span>
+{
+	<span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;Hugo&#34;</span>,
+	<span style="color:#f92672">&#34;build&#34;</span>: {
+		<span style="color:#f92672">&#34;dockerfile&#34;</span>: <span style="color:#e6db74">&#34;Dockerfile&#34;</span>,
+		<span style="color:#f92672">&#34;args&#34;</span>: {
+			<span style="color:#f92672">&#34;VARIANT&#34;</span>: <span style="color:#e6db74">&#34;hugo_extended&#34;</span>,
+			<span style="color:#f92672">&#34;VERSION&#34;</span>: <span style="color:#e6db74">&#34;0.74.0&#34;</span>
+		}
+	},
+	<span style="color:#f92672">&#34;settings&#34;</span>: {
+		<span style="color:#f92672">&#34;terminal.integrated.shell.linux&#34;</span>: <span style="color:#e6db74">&#34;/bin/zsh&#34;</span>
+	},
+	<span style="color:#f92672">&#34;extensions&#34;</span>: [
+		<span style="color:#e6db74">&#34;bungcip.better-toml&#34;</span>,
+		<span style="color:#e6db74">&#34;davidanson.vscode-markdownlint&#34;</span>
+	],
+	<span style="color:#f92672">&#34;forwardPorts&#34;</span>: [
+		<span style="color:#ae81ff">1313</span>
+	],
+	<span style="color:#f92672">&#34;remoteUser&#34;</span>: <span style="color:#e6db74">&#34;vscode&#34;</span>
+}
+</code></pre></div><p>Once you have those files in place press <code>Ctrl + Shift + P</code> to get the following menu:</p>
+
+    <img src="/img/vscode-open-in-container.png"  class="center"  />
+
+
+<p>Choose &ldquo;Remote-Containers: Open Folder in Container&hellip;&rdquo; and select your workspace folder where you want to scaffold the hugo site. If all went well you should see a terminal with the zsh shell opened.</p>
+<p>Time to initialize our hugo site! Run the command <code>hugo new site &lt;outputfolder&gt;</code> to scaffold your new site.</p>
+
+    <img src="/img/vscode-terminal-hugo-test.png"  class="center"  />
+
+
+<p>From here on out you can start working on that site! What I did first was:</p>
+<ul>
+<li>Look for a few nice <a href="https://themes.gohugo.io/">themes</a>, plenty of site themes specifically for blogs.</li>
+<li>Learn about the built in <a href="https://gohugo.io/content-management/shortcodes/">Shortcodes</a></li>
+<li>Add some <a href="https://code.visualstudio.com/docs/editor/tasks">VSCode tasks</a> to limit my time retyping commands in a command line.</li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>So! I hope you had at least a bit of fun messing around with some devtools right? ;)
+I must say my first blog post of the month was written faster than i thought!
+Do drop a comment if you have any remarks or feedback on how I can make this better, it is very appreciated!</p>
+<p>About the next topic&hellip; Probably something Blue-team related, stay tuned!</p>
+
+    <img src="/img/goodbye.jpg"  class="center"  />
+
+
+]]></content>
+        </item>
+        
+    </channel>
+</rss>

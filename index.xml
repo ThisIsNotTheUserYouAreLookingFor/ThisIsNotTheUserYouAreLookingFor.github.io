@@ -7,9 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://thisisnottheuseryouarelookingfor.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Testing, testing, 1,2,3</title>
+      <link>http://thisisnottheuseryouarelookingfor.github.io/posts/2020/08/testing-testing-123/</link>
+      <pubDate>Mon, 31 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://thisisnottheuseryouarelookingfor.github.io/posts/2020/08/testing-testing-123/</guid>
+      <description>Welcome! Welcome to my second attempt ever to start a blog! The idea is to do a minimum of one post per month based on a few ground rules:
+ It must provide knowledge people may benefit from Not each topic is necessarily tech-related Every post must be accessible and provide enough information so less tech-savvy people may enjoy reading them as well.  This Month&amp;rsquo;s topic is&amp;hellip; Blogs! What better way to start off than to explain how I setup my development environment to embark on this journey, am I right?</description>
+    </item>
     
     <item>
       <title></title>
