@@ -3,24 +3,24 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>localhost/about/</loc>
+    <loc>http://thisisnottheuseryouarelookingfor.github.io/about/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>localhost/blog/</loc>
+    <loc>http://thisisnottheuseryouarelookingfor.github.io/blog/</loc>
   </url>
   
   <url>
-    <loc>localhost/</loc>
+    <loc>http://thisisnottheuseryouarelookingfor.github.io/</loc>
   </url>
   
   <url>
-    <loc>localhost/series/</loc>
+    <loc>http://thisisnottheuseryouarelookingfor.github.io/series/</loc>
   </url>
   
   <url>
-    <loc>localhost/tags/</loc>
+    <loc>http://thisisnottheuseryouarelookingfor.github.io/tags/</loc>
   </url>
   
 </urlset>
