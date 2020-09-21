@@ -15,11 +15,11 @@
             <pubDate>Mon, 21 Sep 2020 00:00:00 +0000</pubDate>
             
             <guid>https://thisisnottheuseryouarelookingfor.github.io/posts/2020/09/socdocs-tackling-usecase-versioning-documentation-in-qradar/</guid>
-            <description>SOC Documentation issues Consistent and easy to use documentation of rules and building blocks in QRadar has been a thorn in my side for quite some time. The tool allows for some rule notes, but doesn&amp;rsquo;t provide any versioning or audit logging of who changed what. If you combine that with a SOC that requires a lot of custom rule development, keeping your documentation in order becomes a nightmare.
+            <description>SOC Documentation issues Consistent and easy to use documentation of rules and building blocks in QRadar has been a thorn in my side for quite some time. QRadar allows for some rule notes, but doesn&amp;rsquo;t provide any versioning or audit logging of who changed what. If you combine that with a SOC that requires a lot of custom rule development, keeping your documentation in order becomes a nightmare.
 Stuff I have seen tried to document these rules:</description>
             <content type="html"><![CDATA[<h2 id="soc-documentation-issues">SOC Documentation issues</h2>
 <p>Consistent and easy to use documentation of rules and building blocks in QRadar has been a thorn in my side for quite some time.
-The tool allows for some rule notes, but doesn&rsquo;t provide any versioning or audit logging of who changed what.
+QRadar allows for some rule notes, but doesn&rsquo;t provide any versioning or audit logging of who changed what.
 If you combine that with a SOC that requires a lot of custom rule development, keeping your documentation in order becomes a nightmare.</p>
 <p>Stuff I have seen tried to document these rules:</p>
 <ul>
@@ -35,6 +35,10 @@ If you combine that with a SOC that requires a lot of custom rule development, k
 </ul>
 <p>All three have some things that I would like to see in my ultimate documentation tool: versioning, audit logging, quick search. But they are all missing one key ingredient: <strong>Automation</strong></p>
 <p>We did try to work around the limitations through the use of the rule explorer and use case manager apps, but these weren&rsquo;t working exactly as we wanted them to. So, time to pull up those sleeves and get working on something that would work for not just us, but everyone else that has the same issue.</p>
+
+    <img src="/img/doc_meme.jpg"  class="center"  />
+
+
 <p>First, let&rsquo;s define a few steps how we&rsquo;re going to tackle this problem:</p>
 <ul>
 <li>Get the rules: we need some way to get the ruleset out of QRadar.</li>
