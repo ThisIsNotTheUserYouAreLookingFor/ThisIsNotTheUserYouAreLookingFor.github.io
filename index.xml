@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-    <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 21 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://thisisnottheuseryouarelookingfor.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Socdocs: Tackling Usecase Versioning &amp; Documentation in QRadar</title>
+      <link>https://thisisnottheuseryouarelookingfor.github.io/posts/2020/09/socdocs-tackling-usecase-versioning-documentation-in-qradar/</link>
+      <pubDate>Mon, 21 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://thisisnottheuseryouarelookingfor.github.io/posts/2020/09/socdocs-tackling-usecase-versioning-documentation-in-qradar/</guid>
+      <description>SOC Documentation issues Consistent and easy to use documentation of rules and building blocks in QRadar has been a thorn in my side for quite some time. The tool allows for some rule notes, but doesn&amp;rsquo;t provide any versioning or audit logging of who changed what. If you combine that with a SOC that requires a lot of custom rule development, keeping your documentation in order becomes a nightmare.
+Stuff I have seen tried to document these rules:</description>
+    </item>
     
     <item>
       <title>Testing, testing, 1,2,3</title>

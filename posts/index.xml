@@ -6,8 +6,166 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
         <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
-        <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
+        <lastBuildDate>Mon, 21 Sep 2020 00:00:00 +0000</lastBuildDate>
         <atom:link href="https://thisisnottheuseryouarelookingfor.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Socdocs: Tackling Usecase Versioning &amp; Documentation in QRadar</title>
+            <link>https://thisisnottheuseryouarelookingfor.github.io/posts/2020/09/socdocs-tackling-usecase-versioning-documentation-in-qradar/</link>
+            <pubDate>Mon, 21 Sep 2020 00:00:00 +0000</pubDate>
+            
+            <guid>https://thisisnottheuseryouarelookingfor.github.io/posts/2020/09/socdocs-tackling-usecase-versioning-documentation-in-qradar/</guid>
+            <description>SOC Documentation issues Consistent and easy to use documentation of rules and building blocks in QRadar has been a thorn in my side for quite some time. The tool allows for some rule notes, but doesn&amp;rsquo;t provide any versioning or audit logging of who changed what. If you combine that with a SOC that requires a lot of custom rule development, keeping your documentation in order becomes a nightmare.
+Stuff I have seen tried to document these rules:</description>
+            <content type="html"><![CDATA[<h2 id="soc-documentation-issues">SOC Documentation issues</h2>
+<p>Consistent and easy to use documentation of rules and building blocks in QRadar has been a thorn in my side for quite some time.
+The tool allows for some rule notes, but doesn&rsquo;t provide any versioning or audit logging of who changed what.
+If you combine that with a SOC that requires a lot of custom rule development, keeping your documentation in order becomes a nightmare.</p>
+<p>Stuff I have seen tried to document these rules:</p>
+<ul>
+<li>
+<p>Excel on Sharepoint: Changes to the excel file would be versioned, so changing the rule syntax in the excel worked, but it was hell to maintain.</p>
+</li>
+<li>
+<p>Confluence: By creating pages per rule and copy-pasting the rule syntax, provides you with search features, so that&rsquo;s a bonus. Still too much manual labor though.</p>
+</li>
+<li>
+<p>Rule notes: keeping a changelog in the rule notes works, but the lack of a quick full-text search through the rule catalog to see if something already exists in a variant or the other makes it not that effective. Also missing any kind of versioning, unless you consider custom content backups as versioning.</p>
+</li>
+</ul>
+<p>All three have some things that I would like to see in my ultimate documentation tool: versioning, audit logging, quick search. But they are all missing one key ingredient: <strong>Automation</strong></p>
+<p>We did try to work around the limitations through the use of the rule explorer and use case manager apps, but these weren&rsquo;t working exactly as we wanted them to. So, time to pull up those sleeves and get working on something that would work for not just us, but everyone else that has the same issue.</p>
+<p>First, let&rsquo;s define a few steps how we&rsquo;re going to tackle this problem:</p>
+<ul>
+<li>Get the rules: we need some way to get the ruleset out of QRadar.</li>
+<li>Create documentation pages: Based on the ruleset, I want a set of markdown pages that define the rules with the following data:
+<ul>
+<li>Rule Description</li>
+<li>Rule Origin</li>
+<li>Rule Syntax</li>
+<li>A changelog that is easy to create.</li>
+</ul>
+</li>
+<li>Host the latest set of these pages and make them searchable</li>
+</ul>
+<p>TLDR: I made a toolkit that does that <a href="https://github.com/dpb-infosec/socdocs">https://github.com/dpb-infosec/socdocs</a>. Run the following command and browse to 127.0.0.1:8080 to see it in action:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run -it -p 8080:80 dpbinfosec/socdocs
+</code></pre></div>
+    <img src="/img/socdocs.png"  class="center"  />
+
+
+<h2 id="step-1-get-the-rules">Step 1: Get the Rules</h2>
+<p>The first part of our journey is trying to get a complete dump of the ruleset in its current state.
+The QRadar RESt Api documentation quickly shows me there&rsquo;s no way I&rsquo;m going to get the rule syntax through some simple HTTP calls. No problem! The Rule explorer app ingests data in the format of an XML that you can create via the contentmanagement.pl script.</p>
+<p>I use the following commandline to generate the bare minimum xml for what I need:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">/opt/qradar/bin/contentManagement.pl <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>--action export <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>--content-type <span style="color:#ae81ff">3</span> --id all
+</code></pre></div><p>The XML looks like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34; standalone=&#34;yes&#34;?&gt;</span>
+
+<span style="color:#f92672">&lt;content&gt;</span>
+    <span style="color:#f92672">&lt;qradarversion&gt;</span>2019.18.4.20200629201233<span style="color:#f92672">&lt;/qradarversion&gt;</span>
+    <span style="color:#f92672">&lt;custom_rule&gt;</span>
+        <span style="color:#f92672">&lt;base_capacity&gt;</span>3432329<span style="color:#f92672">&lt;/base_capacity&gt;</span>
+        <span style="color:#f92672">&lt;origin&gt;</span>OVERRIDE<span style="color:#f92672">&lt;/origin&gt;</span>
+        <span style="color:#f92672">&lt;mod_date&gt;</span>2020-05-08T10:41:20.973+02:00<span style="color:#f92672">&lt;/mod_date&gt;</span>
+        <span style="color:#f92672">&lt;rule_data&gt;</span>PHJ1bGUgb3ZlcnJpZG...cnVsZT4=<span style="color:#f92672">&lt;/rule_data&gt;</span>
+        <span style="color:#f92672">&lt;uuid&gt;</span>SYSTEM-1376<span style="color:#f92672">&lt;/uuid&gt;</span>
+        <span style="color:#f92672">&lt;capacity_timestamp&gt;</span>1599170974000<span style="color:#f92672">&lt;/capacity_timestamp&gt;</span>
+        <span style="color:#f92672">&lt;rule_type&gt;</span>5<span style="color:#f92672">&lt;/rule_type&gt;</span>
+        <span style="color:#f92672">&lt;average_capacity&gt;</span>3432329<span style="color:#f92672">&lt;/average_capacity&gt;</span>
+        <span style="color:#f92672">&lt;base_host_id&gt;</span>53<span style="color:#f92672">&lt;/base_host_id&gt;</span>
+        <span style="color:#f92672">&lt;id&gt;</span>1376<span style="color:#f92672">&lt;/id&gt;</span>
+        <span style="color:#f92672">&lt;create_date&gt;</span>2006-05-05T07:17:35.821+02:00<span style="color:#f92672">&lt;/create_date&gt;</span>
+    <span style="color:#f92672">&lt;/custom_rule&gt;</span>
+
+</code></pre></div><p>The custom_rule XML is a bit exotic, more about that in the next part :) Nevertheless, this seems the easiest way to pull the information, so I decided to work based on that XML, as I want to keep the processing on the QRadar appliances themselves to a minimum.
+I have also created a small cronjob that generates the XML and pushes it towards a git repository, this will play to our advantage as we can use those events as triggers for a CI/CD pipeline.</p>
+<h2 id="step-2-create-documentation-pages">Step 2: Create documentation pages</h2>
+<p>Working from the XML above, it seems we have a two-layered system:</p>
+<ul>
+<li>Some top-level metadata about the rule.</li>
+<li>The actual rule data, being a base64 encoded version of an XML.</li>
+</ul>
+<p>Since this is going to require some XML parsing I opted for Python3, as I worked with the XML libs before.</p>
+<p>A quick summary of the script:</p>
+<ul>
+<li>Loop every rule in the XML
+<ul>
+<li>Create an empty rule object</li>
+<li>Take the metadata I need from the top level and persist it in the rule object</li>
+<li>Decode the rule data XML</li>
+<li>Loop the elements in the rule data to generate a rule syntax like the one in QRadar</li>
+<li>Persist the rule syntax in the rule object</li>
+<li>Render a markdown file with the completed rule object.</li>
+</ul>
+</li>
+</ul>
+<p>In the end I added a few additional tweaks, like create/cleaning the folder structure.</p>
+<p>This is what I ended up with (subject to improvement): <a href="https://github.com/dpb-infosec/socdocs/blob/master/exportparser.py">https://github.com/dpb-infosec/socdocs/blob/master/exportparser.py</a></p>
+<p>Now that we have the markdown pages, we can save these to a git folder. This way, we version all rules  through git, and it even provides us with line-per-line changes that were added/removed between two versions of a rule!</p>
+<p>Markdown pages are great, and render well in most git repos with some kind of front-end, but we still have to do things manually at this point. If anyone forgets to generate a new set of files and update the git repo we would be stuck with out-of-sync documentation. How about we automate it so that upon updating  the XML file the python script runs, generates the files, and hosts them somewhere?</p>
+<h2 id="automation-through-cicd-pipelines">Automation through CICD pipelines</h2>
+<p>Let&rsquo;s take a quick look at the Dockerfile:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Dockerfile" data-lang="Dockerfile"><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> alpine:latest AS hugo</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENV</span> HUGO_VERSION 0.74.3<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">ENV</span> GLIBC_VERSION 2.32-r0<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> apk add --no-cache <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    bash <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    curl <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    git <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    libstdc++ <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    sudo<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> wget  -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  wget <span style="color:#e6db74">&#34;https://github.com/sgerrand/alpine-pkg-glibc/releases/download/</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">/glibc-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  apk --no-cache add <span style="color:#e6db74">&#34;glibc-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  rm <span style="color:#e6db74">&#34;glibc-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  wget <span style="color:#e6db74">&#34;https://github.com/sgerrand/alpine-pkg-glibc/releases/download/</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">/glibc-bin-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  apk --no-cache add <span style="color:#e6db74">&#34;glibc-bin-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  rm <span style="color:#e6db74">&#34;glibc-bin-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  wget <span style="color:#e6db74">&#34;https://github.com/sgerrand/alpine-pkg-glibc/releases/download/</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">/glibc-i18n-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  apk --no-cache add <span style="color:#e6db74">&#34;glibc-i18n-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span><span style="color:#f92672">&amp;&amp;</span>  rm <span style="color:#e6db74">&#34;glibc-i18n-</span><span style="color:#e6db74">${</span>GLIBC_VERSION<span style="color:#e6db74">}</span><span style="color:#e6db74">.apk&#34;</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> mkdir -p /usr/local/src <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#f92672">&amp;&amp;</span> cd /usr/local/src <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#f92672">&amp;&amp;</span> curl -L https://github.com/gohugoio/hugo/releases/download/v<span style="color:#e6db74">${</span>HUGO_VERSION<span style="color:#e6db74">}</span>/hugo_extended_<span style="color:#e6db74">${</span>HUGO_VERSION<span style="color:#e6db74">}</span>_linux-64bit.tar.gz | tar -xz <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#f92672">&amp;&amp;</span> mv hugo /usr/local/bin/hugo<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> doc_site /doc_site<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">WORKDIR</span><span style="color:#e6db74"> /doc_site</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">RUN</span> /usr/local/bin/hugo<span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">FROM</span><span style="color:#e6db74"> nginx</span><span style="color:#960050;background-color:#1e0010">
+</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">COPY</span> --from<span style="color:#f92672">=</span>hugo ./doc_site/public /usr/share/nginx/html<span style="color:#960050;background-color:#1e0010">
+</span></code></pre></div><p>As you can see I am using a build container to generate the static pages.
+Using a Hugo theme for that worked really well to present the documentation!</p>
+<p>Now that we have all the components, time to stitch it all together with a pipeline. I used Github actions for this demo, but you should be able to get it modded for other CI/CD tools.</p>
+<p>Check it out here: <a href="https://github.com/dpb-infosec/socdocs/blob/master/.github/workflows/main.yml">https://github.com/dpb-infosec/socdocs/blob/master/.github/workflows/main.yml</a></p>
+<p>Here&rsquo;s a quick overview of the different steps in the pipeline:</p>
+<ul>
+<li>Check out the repository</li>
+<li>Install python</li>
+<li>Install python dependencies</li>
+<li>Run the script</li>
+<li>Build a docker container and push it to a repository (DockerHub in this case)</li>
+</ul>
+<p>I have added to system rules that I modded to the template project, to show you how it looks in the end. You can see the end result by running the following command locally:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">docker run -it -p 8080:80 dpbinfosec/socdocs
+</code></pre></div><p>After that, just browse to <a href="http://127.0.0.1:8080/">http://127.0.0.1:8080/</a></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>And that&rsquo;s it! From here on out you can run the container anywhere you want, be it a k8s cluster, or just a simple VM with docker support!
+I hope this can help out a few other SOCS that use QRadar. As always: feel free to send a PR, or ask if something is unclear. I&rsquo;ll update the toolkit from time to time with additional helpful information. See you next month!</p>
+
+    <img src="/img/done_and_done.gif"  class="center"  />
+
+
+]]></content>
+        </item>
         
         <item>
             <title>Testing, testing, 1,2,3</title>
